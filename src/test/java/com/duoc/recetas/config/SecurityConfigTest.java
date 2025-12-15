@@ -14,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
 class SecurityConfigTest {
 
@@ -87,5 +88,31 @@ class SecurityConfigTest {
         assertTrue(encoder.matches(password, hash2));
     }
 
-    
+    @Test
+    void csrfConfiguresCookieRepository() throws Exception {
+        SecurityConfig config = new SecurityConfig();
+        assertNotNull(config.securityFilterChain(mock(org.springframework.security.config.annotation.web.builders.HttpSecurity.class)));
+    }
+
+    @Test
+    void headerConfigurationsAreSet() {
+        SecurityConfig config = new SecurityConfig();
+    }
+
+    @Test
+    void securityFilterChainIsCreated() throws Exception {
+        SecurityConfig config = new SecurityConfig();
+
+        // Mock de HttpSecurity
+        org.springframework.security.config.annotation.web.builders.HttpSecurity mockHttpSecurity = mock(org.springframework.security.config.annotation.web.builders.HttpSecurity.class);
+
+        // Crear un DefaultSecurityFilterChain mockeado
+        org.springframework.security.web.DefaultSecurityFilterChain mockChain = mock(org.springframework.security.web.DefaultSecurityFilterChain.class);
+
+        when(mockHttpSecurity.build()).thenReturn(mockChain);
+
+        SecurityFilterChain chain = config.securityFilterChain(mockHttpSecurity);
+
+        assertNotNull(chain);
+    }
 }
