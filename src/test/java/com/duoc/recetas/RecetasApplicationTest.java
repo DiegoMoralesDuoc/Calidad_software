@@ -1,5 +1,8 @@
 package com.duoc.recetas;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
+
 import org.junit.jupiter.api.Test;
 
 class RecetasApplicationTest {
@@ -8,13 +11,17 @@ class RecetasApplicationTest {
     void mainRunsWithoutExceptionWhenSkipRunTrue() {
         System.setProperty("app.test.skipRun", "true");
         String[] args = {};
-        RecetasApplication.main(args);
+        assertDoesNotThrow(() -> RecetasApplication.main(args));
     }
 
+
+
     @Test
-    void logStartupDoesNotThrow() throws Exception {
-        var method = RecetasApplication.class.getDeclaredMethod("logStartup");
-        method.setAccessible(true);
-        method.invoke(null);
+    void logStartupDoesNotThrow() {
+        assertDoesNotThrow(() -> {
+            var method = RecetasApplication.class.getDeclaredMethod("logStartup");
+            method.setAccessible(true);
+            method.invoke(null);
+        });
     }
 }
