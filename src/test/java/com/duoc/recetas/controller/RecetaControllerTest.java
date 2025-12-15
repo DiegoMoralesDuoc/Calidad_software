@@ -61,6 +61,7 @@ class RecetaControllerTest {
         userDetails = new User("user", "pwd", List.of(new SimpleGrantedAuthority("ROLE_USER")));
     }
 
+    // ================== BUSCAR ==================
     @Test
     void buscarSinFiltrosRetornaTodasLasRecetas() {
         Model model = new ExtendedModelMap();
@@ -72,6 +73,18 @@ class RecetaControllerTest {
         assertEquals(1, ((List<?>) model.getAttribute("recetas")).size());
     }
 
+    @Test
+    void buscarConFiltrosRetornaResultadosFiltrados() {
+        Model model = new ExtendedModelMap();
+        when(recetaService.buscarRecetas("r", "t", "p", "f")).thenReturn(List.of(receta));
+
+        String view = recetaController.buscar("r", "t", "p", "f", model);
+
+        assertEquals("buscar", view);
+        assertEquals(1, ((List<?>) model.getAttribute("recetas")).size());
+    }
+
+    // ================== DETALLE ==================
     @Test
     void detalleConRecetaEncontrada() {
         Model model = new ExtendedModelMap();
@@ -100,6 +113,20 @@ class RecetaControllerTest {
     }
 
     @Test
+    void detalleConUsuarioNoEncontradoNoFalla() {
+        Model model = new ExtendedModelMap();
+        when(recetaService.obtenerRecetaPorId(10L)).thenReturn(Optional.of(receta));
+        when(comentarioService.obtenerComentariosPorReceta(receta)).thenReturn(List.of());
+        when(valoracionService.obtenerPromedioValoracion(receta)).thenReturn(0.0);
+        when(valoracionService.contarValoraciones(receta)).thenReturn(0L);
+        when(usuarioRepository.findByUsername("user")).thenReturn(Optional.empty());
+
+        String view = recetaController.detalle(10L, model, userDetails);
+        assertEquals("detalle", view);
+    }
+
+    // ================== CREAR COMENTARIO ==================
+    @Test
     void crearComentarioRedirigeAlDetalle() {
         RedirectAttributes redirect = new RedirectAttributesModelMap();
         when(recetaService.obtenerRecetaPorId(10L)).thenReturn(Optional.of(receta));
@@ -111,6 +138,19 @@ class RecetaControllerTest {
         verify(comentarioService).crearComentario(receta, usuario, "texto");
     }
 
+    @Test
+    void crearComentarioConTextoNuloNoCreaComentario() {
+        RedirectAttributes redirect = new RedirectAttributesModelMap();
+        when(recetaService.obtenerRecetaPorId(10L)).thenReturn(Optional.of(receta));
+        when(usuarioRepository.findByUsername("user")).thenReturn(Optional.of(usuario));
+
+        String view = recetaController.crearComentario(10L, "  ", userDetails, redirect);
+
+        assertEquals("redirect:/recetas/detalle/10", view);
+        verify(comentarioService, never()).crearComentario(any(), any(), any());
+    }
+
+    // ================== VALORAR ==================
     @Test
     void valorarRecetaGuardaValoracion() {
         RedirectAttributes redirect = new RedirectAttributesModelMap();
@@ -124,6 +164,20 @@ class RecetaControllerTest {
     }
 
     @Test
+    void valorarRecetaConExcepcionManejaError() {
+        RedirectAttributes redirect = new RedirectAttributesModelMap();
+        when(recetaService.obtenerRecetaPorId(10L)).thenReturn(Optional.of(receta));
+        when(usuarioRepository.findByUsername("user")).thenReturn(Optional.of(usuario));
+        doThrow(new IllegalArgumentException("error")).when(valoracionService).crearOActualizarValoracion(receta, usuario, 6);
+
+        String view = recetaController.valorarReceta(10L, 6, userDetails, redirect);
+
+        assertEquals("redirect:/recetas/detalle/10", view);
+        assertTrue(redirect.getFlashAttributes().containsKey("mensajeError"));
+    }
+
+    // ================== ELIMINAR ==================
+    @Test
     void eliminarRecetaPropiaExito() {
         RedirectAttributes redirect = new RedirectAttributesModelMap();
         when(usuarioRepository.findByUsername("user")).thenReturn(Optional.of(usuario));
@@ -133,5 +187,40 @@ class RecetaControllerTest {
 
         assertEquals("redirect:/recetas/buscar", view);
         assertTrue(redirect.getFlashAttributes().containsKey("mensajeExito"));
+    }
+
+    @Test
+    void eliminarRecetaNoAutorMuestraError() {
+        RedirectAttributes redirect = new RedirectAttributesModelMap();
+        when(usuarioRepository.findByUsername("user")).thenReturn(Optional.of(usuario));
+        when(recetaService.eliminarRecetaPorAutor(10L, usuario)).thenReturn(false);
+
+        String view = recetaController.eliminarReceta(10L, userDetails, redirect);
+
+        assertEquals("redirect:/recetas/detalle/10", view);
+        assertTrue(redirect.getFlashAttributes().containsKey("mensajeError"));
+    }
+
+    @Test
+    void eliminarRecetaUsuarioNoEncontradoMuestraError() {
+        RedirectAttributes redirect = new RedirectAttributesModelMap();
+        when(usuarioRepository.findByUsername("user")).thenReturn(Optional.empty());
+
+        String view = recetaController.eliminarReceta(10L, userDetails, redirect);
+
+        assertEquals("redirect:/recetas/detalle/10", view);
+        assertTrue(redirect.getFlashAttributes().containsKey("mensajeError"));
+    }
+
+    // ================== LISTA ==================
+    @Test
+    void listaDevuelveTodasLasRecetas() {
+        Model model = new ExtendedModelMap();
+        when(recetaService.obtenerTodasLasRecetas()).thenReturn(List.of(receta));
+
+        String view = recetaController.lista(model);
+
+        assertEquals("buscar", view);
+        assertEquals(1, ((List<?>) model.getAttribute("recetas")).size());
     }
 }
