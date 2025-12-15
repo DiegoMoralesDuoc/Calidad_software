@@ -8,6 +8,7 @@ public final class SecurityPolicies {
 
     private SecurityPolicies() {
         // Utilidad estática
+        throw new UnsupportedOperationException("Clase de utilidad estática");
     }
 
     public static final String CONTENT_SECURITY_POLICY =

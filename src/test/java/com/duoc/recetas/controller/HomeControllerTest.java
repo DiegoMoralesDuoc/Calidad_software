@@ -74,4 +74,15 @@ class HomeControllerTest {
         assertEquals("error", view);
         assertEquals("Ha ocurrido un error. Por favor, intenta nuevamente.", model.getAttribute("mensaje"));
     }
+
+    @Test
+    void loginDebeMostrarLoginSinErrorNiLogout() {
+        Model model = new ExtendedModelMap();
+
+        String view = homeController.login(null, null, model);
+
+        assertEquals("login", view);
+        assertFalse(model.containsAttribute("error"));
+        assertFalse(model.containsAttribute("logout"));
+    }
 }

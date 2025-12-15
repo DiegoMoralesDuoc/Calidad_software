@@ -10,7 +10,7 @@ services:
       MYSQL_USER: recetas_user
       MYSQL_PASSWORD: recetas_pass
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       # Persistencia de datos
       - mysql_data:/var/lib/mysql

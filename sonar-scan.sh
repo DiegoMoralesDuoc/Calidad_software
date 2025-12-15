@@ -1,63 +1,26 @@
 #!/bin/bash
 
 echo "=========================================="
-echo "🔍 EJECUTANDO ANÁLISIS SONARQUBE"
+echo "🔍 EJECUTANDO ANÁLISIS SONARQUBE DESDE HOST"
 echo "=========================================="
-echo ""
 
-# Verificar que los contenedores estén corriendo
-if ! docker ps | grep -q "recetas_app"; then
-    echo "❌ Error: El contenedor recetas_app no está corriendo"
-    echo "   Ejecuta: ./docker-start.sh"
-    exit 1
-fi
-
-if ! docker ps | grep -q "sonarqube"; then
-    echo "❌ Error: El contenedor sonarqube no está corriendo"
-    echo "   Ejecuta: ./sonarqube-start.sh"
-    exit 1
-fi
-
-echo "✅ Contenedores activos"
-echo ""
-
-# Conectar recetas_app a la red de sonarqube si no está conectado
-echo "🔗 Verificando conectividad entre contenedores..."
-docker network connect sumativa1-semana3_sonarqube-network recetas_app 2>/dev/null || echo "   Ya está conectado a la red"
-
-echo ""
-echo "🚀 Ejecutando sonar-scanner en recetas_app..."
-echo ""
-
-# Crear directorio para cache de Maven si no existe
-echo "📦 Configurando cache de Maven..."
-docker exec recetas_app sh -c "mkdir -p /.m2/repository" 2>/dev/null || true
-
-# Ejecutar análisis de SonarQube dentro del contenedor
-# Usa /.m2 que se monta como volumen persistente (ver .devcontainer o docker-compose)
-docker exec recetas_app sh -c "mvn clean verify sonar:sonar \
-  -Dmaven.repo.local=/.m2/repository \
-  -DskipTests=false \
-  -Dsonar.projectKey=app_recetas_v2 \
-  -Dsonar.projectName='app_recetas_v2' \
-  -Dsonar.host.url=http://sonarqube:9000 \
-  -Dsonar.token=sqp_f4968f6d854567b6321b02fe8c659321a3df2d8b"
+# Comando exitoso de Maven ejecutado directamente en el host
+mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+  -Dsonar.projectKey=app_recetas_v3 \
+  -Dsonar.projectName='app_recetas_v3' \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.token=sqp_fca0510ea2e4c07d69c1b8a7e028d90849189dcb
 
 if [ $? -eq 0 ]; then
     echo ""
     echo "=========================================="
-    echo "✅ ANÁLISIS COMPLETADO"
+    echo "✅ ANÁLISIS COMPLETADO (Verifica Cobertura en SonarQube)"
     echo "=========================================="
     echo ""
-    echo "📊 Ver resultados en: http://localhost:9000/dashboard?id=app_recetas_v2"
+    echo "📊 Ver resultados en: http://localhost:9000/dashboard?id=app_recetas_v3"
     echo ""
 else
     echo ""
-    echo "❌ Error en el análisis"
-    echo ""
-    echo "💡 Verifica:"
-    echo "   1. Token correcto en SonarQube"
-    echo "   2. Proyecto creado en SonarQube"
-    echo "   3. Contenedores en la misma red"
+    echo "❌ Error en el análisis. Intenta reiniciar SonarQube."
     echo ""
 fi
