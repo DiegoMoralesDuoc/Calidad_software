@@ -5,9 +5,16 @@ import org.junit.jupiter.api.Test;
 class RecetasApplicationTest {
 
     @Test
-    void mainHonorsTestSkipRunProperty() {
+    void mainRunsWithoutExceptionWhenSkipRunTrue() {
         System.setProperty("app.test.skipRun", "true");
-        RecetasApplication.main(new String[]{});
-        System.clearProperty("app.test.skipRun");
+        String[] args = {};
+        RecetasApplication.main(args);
+    }
+
+    @Test
+    void logStartupDoesNotThrow() throws Exception {
+        var method = RecetasApplication.class.getDeclaredMethod("logStartup");
+        method.setAccessible(true);
+        method.invoke(null);
     }
 }

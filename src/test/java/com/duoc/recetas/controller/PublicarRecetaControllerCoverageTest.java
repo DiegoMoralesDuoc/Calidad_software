@@ -22,7 +22,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import com.duoc.recetas.model.Receta;
-import com.duoc.recetas.model.RecetaMedia;
 import com.duoc.recetas.model.Usuario;
 import com.duoc.recetas.repository.UsuarioRepository;
 import com.duoc.recetas.service.RecetaService;
@@ -41,10 +40,6 @@ class PublicarRecetaControllerCoverageTest {
 
     private UserDetails buildUser() {
         return new User("user", "pwd", java.util.List.of(new SimpleGrantedAuthority("ROLE_USER")));
-    }
-
-    @BeforeEach
-    void setup() {
     }
 
     // ================== FORMULARIO ==================
