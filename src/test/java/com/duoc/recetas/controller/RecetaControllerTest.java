@@ -1,6 +1,7 @@
 package com.duoc.recetas.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
@@ -142,7 +143,7 @@ class RecetaControllerTest {
     void crearComentarioConTextoNuloNoCreaComentario() {
         RedirectAttributes redirect = new RedirectAttributesModelMap();
         when(recetaService.obtenerRecetaPorId(10L)).thenReturn(Optional.of(receta));
-        when(usuarioRepository.findByUsername("user")).thenReturn(Optional.of(usuario));
+        lenient().when(usuarioRepository.findByUsername("user")).thenReturn(Optional.of(usuario));
 
         String view = recetaController.crearComentario(10L, "  ", userDetails, redirect);
 
