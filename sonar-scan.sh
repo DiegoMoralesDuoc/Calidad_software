@@ -9,7 +9,7 @@ mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
   -Dsonar.projectKey=app_recetas_v3 \
   -Dsonar.projectName='app_recetas_v3' \
   -Dsonar.host.url=http://localhost:9000 \
-  -Dsonar.token=sqp_fca0510ea2e4c07d69c1b8a7e028d90849189dcb
+  -Dsonar.token=sqp_f89a7bbdf1238d14ac23e900ad63786225d81d43
 
 if [ $? -eq 0 ]; then
     echo ""

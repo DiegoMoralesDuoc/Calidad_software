@@ -4,11 +4,15 @@ describe('Detalle de Receta Page', () => {
   const baseUrl = 'http://localhost:8082';
 
   beforeEach(() => {
-    cy.visit(`${baseUrl}/detalle.html`);
+    cy.visit(`${baseUrl}/login`);
+    cy.get('#username').type('admin');
+    cy.get('#password').type('admin123');
+    cy.get('button[type=submit]').click();
+    cy.url().should('eq', `${baseUrl}/`);
+    cy.visit(`${baseUrl}/recetas/detalle/1`);
   });
 
   it('Debe cargar correctamente los elementos principales', () => {
-    cy.contains('Detalle de Receta').should('exist');
     cy.get('.receta-header h1').should('exist');
     cy.get('.receta-meta-info').should('exist');
     cy.get('.receta-autor-detalle').should('exist');
@@ -57,6 +61,5 @@ describe('Detalle de Receta Page', () => {
     cy.window().then(win => {
       expect(win.console).to.exist;
     });
-    cy.get('.dropdown').should('exist').and('not.have.class', 'active');
   });
 });

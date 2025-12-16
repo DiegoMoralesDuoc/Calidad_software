@@ -4,6 +4,11 @@ describe('Publicar Receta Page', () => {
   const baseUrl = 'http://localhost:8082';
 
   beforeEach(() => {
+    cy.visit(`${baseUrl}/login`);
+    cy.get('#username').type('admin');
+    cy.get('#password').type('admin123');
+    cy.get('button[type=submit]').click();
+    cy.url().should('eq', `${baseUrl}/`);
     cy.visit(`${baseUrl}/recetas/publicar`);
   });
 

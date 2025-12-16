@@ -4,7 +4,7 @@ describe('Home Page', () => {
   const baseUrl = 'http://localhost:8082';
 
   beforeEach(() => {
-    cy.visit(`${baseUrl}/index.html`);
+    cy.visit(`${baseUrl}/`);
   });
 
   it('Debe cargar correctamente la home', () => {

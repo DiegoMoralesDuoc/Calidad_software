@@ -1,5 +1,8 @@
 {
   "devDependencies": {
-    "cypress": "^15.7.1"
+    "@cypress/code-coverage": "^3.14.7",
+    "cypress": "^15.7.1",
+    "istanbul-lib-coverage": "^3.2.2",
+    "nyc": "^17.1.0"
   }
 }

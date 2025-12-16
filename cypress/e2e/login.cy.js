@@ -3,7 +3,9 @@
 describe('Login Page', () => {
   const baseUrl = 'http://localhost:8082';
   beforeEach(() => {
-    cy.visit(`${baseUrl}/login.html`);
+    cy.clearCookies();
+    cy.clearLocalStorage();
+    cy.visit(`${baseUrl}/login`);
   });
 
   it('Debe cargar correctamente todos los elementos', () => {
@@ -21,8 +23,6 @@ describe('Login Page', () => {
     cy.get('#username').type('admin');
     cy.get('#password').type('admin123');
     cy.get('button[type=submit]').click();
-
-    // Comprueba redirección al home
     cy.url().should('eq', `${baseUrl}/`);
   });
 
@@ -32,7 +32,7 @@ describe('Login Page', () => {
     cy.get('button[type=submit]').click();
 
     cy.get('.alert-error').should('be.visible')
-      .and('contain.text', 'Error de autenticación');
+      .and('contain.text', 'Usuario o contraseña incorrectos');
   });
 
   it('Debe permitir navegar al inicio desde el link', () => {
